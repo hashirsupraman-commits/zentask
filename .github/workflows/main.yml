@@ -21,24 +21,13 @@ jobs:
           channel: 'stable'
 
       - name: Install dependencies
-        run: |
-          if [ -f "pubspec.yaml" ]; then
-            flutter pub get
-          else
-            cd zentask && flutter pub get
-          fi
+        run: flutter pub get
 
       - name: Build APK
-        run: |
-          if [ -f "pubspec.yaml" ]; then
-            flutter build apk --release --no-tree-shake-icons
-          else
-            cd zentask && flutter build apk --release --no-tree-shake-icons
-          fi
+        run: flutter build apk --release --no-tree-shake-icons
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
         with:
           name: ZenTask-APK
-          path: |
-            build/app/outputs/flutter-apk/app-release.apk
-            zentask/build/app/outputs/flutter-apk/app-release.apk
+          path: build/app/outputs/flutter-apk/app-release.apk
