@@ -20,14 +20,28 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Install dependencies
-        run: flutter pub get
+      - name: Find Flutter Project and Install Dependencies
+        run: |
+          # Dhoondte hain pubspec.yaml kahan chhupi hai
+          PUBSPEC_PATH=$(find . -name "pubspec.yaml" -not -path "*/.*/*" | head -n 1)
+          PROJECT_DIR=$(dirname "$PUBSPEC_PATH")
+          echo "Project found in: $PROJECT_DIR"
+          
+          # Us folder ke andar jaakar dependencies install karte hain
+          cd "$PROJECT_DIR"
+          flutter pub get
+          
+          # Save path for next step
+          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
 
       - name: Build APK
-        run: flutter build apk --release --no-tree-shake-icons
+        run: |
+          cd ${{ env.PROJECT_DIR }}
+          flutter build apk --release --no-tree-shake-icons
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ZenTask-APK
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: |
+            **/build/app/outputs/flutter-apk/app-release.apk
